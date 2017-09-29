@@ -25,12 +25,15 @@ import gmp.thiago.popularmovies.data.MovieJson;
 
 public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHolder>{
 
-    private static final String IMAGE_BASE_URL = "http://image.tmdb.org/t/p/";
+    public static final String IMAGE_BASE_URL = "http://image.tmdb.org/t/p/";
     private List<MovieJson.Movie> mMovies = new ArrayList<>();
     private Context mContext;
 
-    public MovieAdapter(Context context) {
+    private MovieClickListener mMovieClickListener;
+
+    public MovieAdapter(Context context, MovieClickListener listener) {
         mContext = context;
+        mMovieClickListener = listener;
     }
 
     @Override
@@ -47,21 +50,12 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
         String posterPath = mMovies.get(position).getPoster_path();
         posterPath = IMAGE_BASE_URL+"w185/"+posterPath;
         Uri uri = Uri.parse(posterPath);
-        Log.d("Thiago", "Position: "+ position+" - "+posterPath);
 
-        Picasso.with(mContext).load(uri).fit().placeholder(R.drawable.ic_image)
-                .into(holder.moviePoster, new Callback() {
-                    @Override
-                    public void onSuccess() {
-                        Log.d("Thiago", "Loaded Successfully");
-                    }
-
-                    @Override
-                    public void onError() {
-                        Log.d("Thiago", "Failed to load");
-
-                    }
-                });
+        Picasso.with(mContext)
+                            .load(uri)
+                            .placeholder(R.drawable.ic_image)
+                            .into(holder.moviePoster);
+        holder.itemView.setTag(position);
 
     }
 
@@ -72,18 +66,32 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
 
     public void setMovies(List movies) {
         mMovies = movies;
-        Log.d("Thiago", ""+movies.size());
         notifyDataSetChanged();
     }
 
-    class MovieViewHolder extends RecyclerView.ViewHolder {
+    public interface MovieClickListener {
+        public void onMovieClicked(MovieJson.Movie movie);
+    }
+
+    /**
+     * View Holder Class.
+     * By implementing OnClickListener, we allow images to be clicked
+     */
+    class MovieViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private ImageView moviePoster;
 
         public MovieViewHolder(View itemView) {
             super(itemView);
             moviePoster = (ImageView)itemView.findViewById(R.id.imageview_movie_poster);
+            itemView.setOnClickListener(this);
         }
 
+        @Override
+        public void onClick(View view) {
+            MovieJson.Movie clickedMovie = mMovies.get(
+                                    Integer.parseInt(view.getTag().toString()));
 
+            mMovieClickListener.onMovieClicked(clickedMovie);
+        }
     }
 }
