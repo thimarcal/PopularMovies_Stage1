@@ -5,9 +5,7 @@ import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -22,7 +20,7 @@ import gmp.thiago.popularmovies.adapter.MovieAdapter;
 import gmp.thiago.popularmovies.data.MovieJson;
 import gmp.thiago.popularmovies.utilities.NetworkUtils;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements MovieAdapter.MovieClickListener{
 
     private RecyclerView mMoviesRV;
     private GridLayoutManager layoutManager;
@@ -44,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
 
         mMoviesRV.setHasFixedSize(true);
 
-        mMovieAdapter = new MovieAdapter(this);
+        mMovieAdapter = new MovieAdapter(getApplicationContext(), this);
         mMoviesRV.setAdapter(mMovieAdapter);
 
         loadMovies();
@@ -72,11 +70,19 @@ public class MainActivity extends AppCompatActivity {
         if (R.id.sort_by == item.getItemId()) {
             //TODO: Here we'll change the settings Later
 
-            Intent intent = new Intent(this, VideoDetailActivity.class);
+            Intent intent = new Intent(this, MovieDetailActivity.class);
             startActivity(intent);
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onMovieClicked(MovieJson.Movie movie) {
+        Intent intent = new Intent(this, MovieDetailActivity.class);
+        intent.putExtra("movie", movie);
+
+        startActivity(intent);
     }
 
 

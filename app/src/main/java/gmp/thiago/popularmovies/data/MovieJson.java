@@ -1,5 +1,9 @@
 package gmp.thiago.popularmovies.data;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -51,7 +55,7 @@ public class MovieJson {
         this.results = results;
     }
 
-    public static class Movie {
+    public static class Movie implements Parcelable {
         /**
          * The Movie Object returned from TheMovieDB request.
          */
@@ -70,6 +74,24 @@ public class MovieJson {
         private String overview;
         private String release_date;
         private List<Integer> genre_ids;
+
+        public Movie(Parcel in) {
+            vote_count = in.readInt();
+            id = in.readInt();
+            video = in.readByte() != 0;
+            vote_average = in.readFloat();
+            title = in.readString();
+            popularity = in.readDouble();
+            poster_path = in.readString();
+            original_language = in.readString();
+            original_title = in.readString();
+            backdrop_path = in.readString();
+            adult = in.readByte() != 0;
+            overview = in.readString();
+            release_date = in.readString();
+            genre_ids = new ArrayList<>();
+            in.readList(genre_ids, null);
+        }
 
         public int getVote_count() {
             return vote_count;
@@ -182,5 +204,41 @@ public class MovieJson {
         public void setGenre_ids(List<Integer> genre_ids) {
             this.genre_ids = genre_ids;
         }
+
+        @Override
+        public int describeContents() {
+            return 0;
+        }
+
+        @Override
+        public void writeToParcel(Parcel parcel, int i) {
+            parcel.writeInt(vote_count);
+            parcel.writeInt(id);
+            parcel.writeByte((byte)(video ? 1 : 0));
+            parcel.writeFloat(vote_average);
+            parcel.writeString(title);
+            parcel.writeDouble(popularity);
+            parcel.writeString(poster_path);
+            parcel.writeString(original_language);
+            parcel.writeString(original_title);
+            parcel.writeString(backdrop_path);
+            parcel.writeByte((byte)(adult ? 1 : 0));
+            parcel.writeString(overview);
+            parcel.writeString(release_date);
+            parcel.writeArray(genre_ids.toArray());
+
+        }
+
+        public static final Parcelable.Creator<Movie> CREATOR = new Creator<Movie>() {
+            @Override
+            public Movie createFromParcel(Parcel in) {
+                return new Movie(in);
+            }
+
+            @Override
+            public Movie[] newArray(int size) {
+                return new Movie[size];
+            }
+        };
     }
 }
