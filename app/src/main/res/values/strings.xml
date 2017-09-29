@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">PopularMovies</string>
+    <string name="sort_by">Sort By</string>
+
+    <string name="invalid_search">Invalid search criteria. Please select a valid search criteria in Settings</string>
+</resources>
