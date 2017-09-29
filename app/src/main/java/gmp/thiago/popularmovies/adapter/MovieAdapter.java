@@ -1,6 +1,7 @@
 package gmp.thiago.popularmovies.adapter;
 
 import android.content.Context;
+import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -9,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -23,7 +25,7 @@ import gmp.thiago.popularmovies.data.MovieJson;
 
 public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHolder>{
 
-    private static final String IMAGE_BASE_URL = " http://image.tmdb.org/t/p/";
+    private static final String IMAGE_BASE_URL = "http://image.tmdb.org/t/p/";
     private List<MovieJson.Movie> mMovies = new ArrayList<>();
     private Context mContext;
 
@@ -42,11 +44,24 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
 
     @Override
     public void onBindViewHolder(MovieViewHolder holder, int position) {
-
         String posterPath = mMovies.get(position).getPoster_path();
         posterPath = IMAGE_BASE_URL+"w185/"+posterPath;
+        Uri uri = Uri.parse(posterPath);
         Log.d("Thiago", "Position: "+ position+" - "+posterPath);
-        Picasso.with(mContext).load(posterPath).fit().placeholder(R.drawable.ic_image).into(holder.moviePoster);
+
+        Picasso.with(mContext).load(uri).fit().placeholder(R.drawable.ic_image)
+                .into(holder.moviePoster, new Callback() {
+                    @Override
+                    public void onSuccess() {
+                        Log.d("Thiago", "Loaded Successfully");
+                    }
+
+                    @Override
+                    public void onError() {
+                        Log.d("Thiago", "Failed to load");
+
+                    }
+                });
 
     }
 
