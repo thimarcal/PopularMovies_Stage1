@@ -26,7 +26,7 @@ import gmp.thiago.popularmovies.data.MovieJson;
 public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHolder>{
 
     public static final String IMAGE_BASE_URL = "http://image.tmdb.org/t/p/";
-    private List<MovieJson.Movie> mMovies = new ArrayList<>();
+    private ArrayList<MovieJson.Movie> mMovies = new ArrayList<>();
     private Context mContext;
 
     private MovieClickListener mMovieClickListener;
@@ -65,8 +65,12 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
     }
 
     public void setMovies(List movies) {
-        mMovies = movies;
+        mMovies = new ArrayList<>(movies);
         notifyDataSetChanged();
+    }
+
+    public ArrayList getMovies() {
+        return mMovies;
     }
 
     public interface MovieClickListener {

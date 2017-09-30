@@ -3,4 +3,6 @@
     <string name="sort_by">Sort By</string>
 
     <string name="invalid_search">Invalid search criteria. Please select a valid search criteria in Settings</string>
+
+    <string name="movies_key" translatable="false">movies</string>
 </resources>
