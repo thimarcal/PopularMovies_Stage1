@@ -2,10 +2,13 @@ package gmp.thiago.popularmovies.activity;
 
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.os.Parcelable;
+import android.os.PersistableBundle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -14,6 +17,8 @@ import com.google.gson.Gson;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 import gmp.thiago.popularmovies.R;
 import gmp.thiago.popularmovies.adapter.MovieAdapter;
@@ -45,12 +50,28 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
         mMovieAdapter = new MovieAdapter(getApplicationContext(), this);
         mMoviesRV.setAdapter(mMovieAdapter);
 
-        loadMovies();
+        // If restoring state, we shall consider saved values, otherwise, we load the movies
+        if (null != savedInstanceState &&
+                    savedInstanceState.containsKey(getString(R.string.movies_key))) {
+            ArrayList movies = savedInstanceState.getParcelableArrayList(getString(R.string.movies_key));
+            mMovieAdapter.setMovies(movies);
+        } else {
+            loadMovies();
+        }
     }
 
     private void loadMovies() {
         // TODO: Read type of search from Shared Preferences
+        Log.d("Thiago", "insideLoadMovies");
         new FetchMoviesData().execute(NetworkUtils.SEARCH_BY_POPULAR);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        // Save state by putting the movies inside the bundle
+        outState.putParcelableArrayList(getString(R.string.movies_key), mMovieAdapter.getMovies());
+
+        super.onSaveInstanceState(outState);
     }
 
     @Override
