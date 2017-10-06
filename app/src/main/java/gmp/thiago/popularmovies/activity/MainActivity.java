@@ -164,7 +164,7 @@ public class MainActivity extends AppCompatActivity
             Gson gson = new Gson();
             MovieJson jsonObject = gson.fromJson(response, MovieJson.class);
 
-            if (null != mMovieAdapter) {
+            if (null != mMovieAdapter && null != jsonObject) {
                 mMovieAdapter.setMovies(jsonObject.getResults());
             }
         }
