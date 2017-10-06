@@ -26,7 +26,7 @@ public class NetworkUtils {
     private static final String TOP_RATED_SEARCH = "top_rated";
 
     private static final String API_KEY_PARAM = "api_key";
-    private static final String API_KEY = ""; // Add Valid TheMoviesDB API KEY here
+    private static final String API_KEY = "a16eb88710bc636dc829029f56ff9cf6"; // Add Valid TheMoviesDB API KEY here
 
     public static final int SEARCH_BY_POPULAR = 0;
     public static final int SEARCH_BY_TOP_RATED = 1;

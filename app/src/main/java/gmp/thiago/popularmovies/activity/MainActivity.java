@@ -1,14 +1,14 @@
 package gmp.thiago.popularmovies.activity;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.os.AsyncTask;
-import android.os.Parcelable;
-import android.os.PersistableBundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -18,18 +18,20 @@ import com.google.gson.Gson;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.List;
 
 import gmp.thiago.popularmovies.R;
 import gmp.thiago.popularmovies.adapter.MovieAdapter;
 import gmp.thiago.popularmovies.data.MovieJson;
 import gmp.thiago.popularmovies.utilities.NetworkUtils;
 
-public class MainActivity extends AppCompatActivity implements MovieAdapter.MovieClickListener{
-
+public class MainActivity extends AppCompatActivity
+                                         implements MovieAdapter.MovieClickListener,
+                                            SharedPreferences.OnSharedPreferenceChangeListener {
     private RecyclerView mMoviesRV;
     private GridLayoutManager layoutManager;
     private MovieAdapter mMovieAdapter;
+
+    private SharedPreferences sharedPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,7 +44,11 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
          */
         mMoviesRV = (RecyclerView)findViewById(R.id.recyclerview_movies);
 
-        layoutManager = new GridLayoutManager(this, 2, GridLayoutManager.VERTICAL, false);
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+            layoutManager = new GridLayoutManager(this, 2, GridLayoutManager.VERTICAL, false);
+        } else {
+            layoutManager = new GridLayoutManager(this, 3, GridLayoutManager.VERTICAL, false);
+        }
         mMoviesRV.setLayoutManager(layoutManager);
 
         mMoviesRV.setHasFixedSize(true);
@@ -50,9 +56,12 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
         mMovieAdapter = new MovieAdapter(getApplicationContext(), this);
         mMoviesRV.setAdapter(mMovieAdapter);
 
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        sharedPreferences.registerOnSharedPreferenceChangeListener(this);
+
         // If restoring state, we shall consider saved values, otherwise, we load the movies
         if (null != savedInstanceState &&
-                    savedInstanceState.containsKey(getString(R.string.movies_key))) {
+                savedInstanceState.containsKey(getString(R.string.movies_key))) {
             ArrayList movies = savedInstanceState.getParcelableArrayList(getString(R.string.movies_key));
             mMovieAdapter.setMovies(movies);
         } else {
@@ -60,10 +69,20 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
         }
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        sharedPreferences.unregisterOnSharedPreferenceChangeListener(this);
+    }
+
     private void loadMovies() {
-        // TODO: Read type of search from Shared Preferences
-        Log.d("Thiago", "insideLoadMovies");
-        new FetchMoviesData().execute(NetworkUtils.SEARCH_BY_POPULAR);
+        String sortType = sharedPreferences.getString(getString(R.string.sort_by_key),
+                                                      getString(R.string.popular));
+        if (sortType.equals(getString(R.string.popular))) {
+            new FetchMoviesData().execute(NetworkUtils.SEARCH_BY_POPULAR);
+        } else if (sortType.equals(getString(R.string.top_rated))) {
+            new FetchMoviesData().execute(NetworkUtils.SEARCH_BY_TOP_RATED);
+        }
     }
 
     @Override
@@ -88,10 +107,8 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (R.id.sort_by == item.getItemId()) {
-            //TODO: Here we'll change the settings Later
-
-            Intent intent = new Intent(this, MovieDetailActivity.class);
+        if (R.id.settings == item.getItemId()) {
+            Intent intent = new Intent(this, SettingsActivity.class);
             startActivity(intent);
         }
 
@@ -101,9 +118,17 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
     @Override
     public void onMovieClicked(MovieJson.Movie movie) {
         Intent intent = new Intent(this, MovieDetailActivity.class);
-        intent.putExtra("movie", movie);
+        intent.putExtra(getString(R.string.movies_key), movie);
 
         startActivity(intent);
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        if (key.equals(getString(R.string.sort_by_key))) {
+
+            loadMovies();
+        }
     }
 
 
