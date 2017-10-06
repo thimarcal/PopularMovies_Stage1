@@ -26,6 +26,7 @@ import gmp.thiago.popularmovies.data.MovieJson;
 public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHolder>{
 
     public static final String IMAGE_BASE_URL = "http://image.tmdb.org/t/p/";
+    public static final String IMAGE_SIZE = "w185/";
     private ArrayList<MovieJson.Movie> mMovies = new ArrayList<>();
     private Context mContext;
 
@@ -48,7 +49,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
     @Override
     public void onBindViewHolder(MovieViewHolder holder, int position) {
         String posterPath = mMovies.get(position).getPoster_path();
-        posterPath = IMAGE_BASE_URL+"w185/"+posterPath;
+        posterPath = IMAGE_BASE_URL+IMAGE_SIZE+posterPath;
         Uri uri = Uri.parse(posterPath);
 
         Picasso.with(mContext)

@@ -47,7 +47,9 @@ public class MovieDetailActivity extends AppCompatActivity {
             overviewTv.setText(movie.getOverview());
 
             movieThumbnailIv = (ImageView) findViewById(R.id.movie_thumbnail_imageview);
-            String thumbnailPath = MovieAdapter.IMAGE_BASE_URL+"w185"+movie.getPoster_path();
+            String thumbnailPath = MovieAdapter.IMAGE_BASE_URL +
+                                                MovieAdapter.IMAGE_SIZE +
+                                                movie.getPoster_path();
             Picasso.with(this).load(thumbnailPath).placeholder(R.drawable.ic_image).into(movieThumbnailIv);
         }
     }
